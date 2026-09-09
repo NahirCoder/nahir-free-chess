@@ -17,12 +17,14 @@ let selected = null;
 let orientation = 'w';
 let modalShown = false;
 let flipping = false;
+let flipTimer = null;
 const files=['a','b','c','d','e','f','g','h'];
 const glyph={p:['♙','♟'],n:['♘','♞'],b:['♗','♝'],r:['♖','♜'],q:['♕','♛'],k:['♔','♚']};
 
 function start(){
   game.reset(); selected=null; orientation='w'; modalShown=false; flipping=false;
-  boardWrap.classList.remove('flipping');
+  clearTimeout(flipTimer); boardWrap.classList.remove('flipping');
+  boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());
   resultModal.classList.add('hidden'); home.classList.add('hidden'); gameScreen.classList.remove('hidden'); render();
 }
 
@@ -39,6 +41,22 @@ function showResult(result){
   if(!result || modalShown) return;
   modalShown=true; resultTitle.textContent=result.title; resultReason.textContent=result.reason; resultIcon.textContent=result.icon;
   resultModal.classList.remove('hidden');
+}
+
+function makeDust(){
+  boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());
+  const edges=[['top',10],['top',26],['top',45],['top',67],['top',91],['bottom',8],['bottom',22],['bottom',51],['bottom',76],['bottom',94],['left',17],['left',39],['left',66],['right',14],['right',43],['right',73]];
+  edges.forEach(([edge,pos],i)=>{
+    const p=document.createElement('i'); p.className='dust-particle'; p.style[edge]=`${pos}%`;
+    p.style.setProperty('--dx',`${edge==='left'?-(9+(i%4)*6):edge==='right'?(9+(i%4)*6):(i%2?6:-6)}px`);
+    p.style.setProperty('--dy',`${edge==='top'?-(5+(i%3)*4):edge==='bottom'?(5+(i%3)*4):(i%2?5:-5)}px`);
+    p.style.setProperty('--delay',`${.52+(i%5)*.018}s`); p.style.setProperty('--size',`${2+(i%3)}px`); boardWrap.appendChild(p);
+  });
+}
+
+function animateFlip(){
+  clearTimeout(flipTimer); boardWrap.classList.remove('flipping'); void boardWrap.offsetWidth; makeDust(); boardWrap.classList.add('flipping');
+  flipTimer=setTimeout(()=>{flipping=false;boardWrap.classList.remove('flipping');boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());document.getElementById('resign').disabled=!!gameResult()},900);
 }
 
 function render(playFlip=false){
@@ -61,21 +79,14 @@ function render(playFlip=false){
     for(const rank of ranks){for(const file of fs){const q=file+rank,p=game.get(q);if(p&&p.type==='k'&&p.color===game.turn()){kingSq=q;break}}if(kingSq)break}
     if(kingSq) boardEl.querySelector(`[data-square="${kingSq}"]`)?.classList.add('check');
   }
-  const turn=game.turn()==='w'?'White':'Black';
-  const result=gameResult();
+  const turn=game.turn()==='w'?'White':'Black', result=gameResult();
   turnText.textContent=result?'Game over':`${turn} to move`;
   statusEl.textContent=result?`${result.title} ${result.reason}`:game.inCheck()?`${turn} is in check`:`${turn} to move`;
   statusEl.className='status'+(result?' game-over':'');
   messageEl.textContent=result?'The game is finished. Start a new game to play again.':'Select a piece to see its legal moves.';
   document.getElementById('resign').disabled=!!result || flipping;
   renderMoves();
-  if(playFlip){
-    flipping=true;
-    boardWrap.classList.remove('flipping');
-    void boardWrap.offsetWidth;
-    boardWrap.classList.add('flipping');
-    window.setTimeout(()=>{flipping=false;boardWrap.classList.remove('flipping');document.getElementById('resign').disabled=!!gameResult()},850);
-  }
+  if(playFlip){flipping=true;animateFlip()}
   showResult(result);
 }
 
@@ -93,17 +104,13 @@ function handleSquare(sq){
 
 function makeMove(from,to,move){
   let promotion;
-  if(move.promotion){
-    const answer=(prompt('Promote to: queen, rook, bishop, or knight','queen')||'queen').toLowerCase().trim();
-    promotion=({queen:'q',rook:'r',bishop:'b',knight:'n'})[answer]||'q';
-  }
+  if(move.promotion){const answer=(prompt('Promote to: queen, rook, bishop, or knight','queen')||'queen').toLowerCase().trim();promotion=({queen:'q',rook:'r',bishop:'b',knight:'n'})[answer]||'q'}
   try{game.move({from,to,promotion});orientation=game.turn()==='w'?'w':'b';selected=null;render(true)}catch(e){selected=null;render()}
 }
 
 function resign(){
   if(game.isGameOver()||flipping)return;
-  const resigning=game.turn()==='w'?'White':'Black';
-  const winner=resigning==='White'?'Black':'White';
+  const resigning=game.turn()==='w'?'White':'Black', winner=resigning==='White'?'Black':'White';
   modalShown=true; resultTitle.textContent=`${winner} wins`; resultReason.textContent=`by resignation (${resigning} resigned)`; resultIcon.textContent=winner==='White'?'♔':'♚';
   turnText.textContent='Game over'; statusEl.textContent=`${winner} wins by resignation`; statusEl.className='status game-over'; messageEl.textContent='The game is finished. Start a new game to play again.'; document.getElementById('resign').disabled=true; resultModal.classList.remove('hidden');
 }

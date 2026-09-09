@@ -45,22 +45,24 @@ function showResult(result){
 
 function makeDust(){
   boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());
-  const edges=[['top',10],['top',26],['top',45],['top',67],['top',91],['bottom',8],['bottom',22],['bottom',51],['bottom',76],['bottom',94],['left',17],['left',39],['left',66],['right',14],['right',43],['right',73]];
+  const edges=[['top',8],['top',19],['top',33],['top',51],['top',70],['top',88],['bottom',6],['bottom',23],['bottom',43],['bottom',63],['bottom',82],['bottom',96],['left',13],['left',31],['left',54],['left',76],['right',17],['right',39],['right',62],['right',84]];
   edges.forEach(([edge,pos],i)=>{
     const p=document.createElement('i'); p.className='dust-particle'; p.style[edge]=`${pos}%`;
-    p.style.setProperty('--dx',`${edge==='left'?-(9+(i%4)*6):edge==='right'?(9+(i%4)*6):(i%2?6:-6)}px`);
+    p.style.setProperty('--dx',`${edge==='left'?-(8+(i%4)*6):edge==='right'?(8+(i%4)*6):(i%2?6:-6)}px`);
     p.style.setProperty('--dy',`${edge==='top'?-(5+(i%3)*4):edge==='bottom'?(5+(i%3)*4):(i%2?5:-5)}px`);
-    p.style.setProperty('--delay',`${.52+(i%5)*.018}s`); p.style.setProperty('--size',`${2+(i%3)}px`); boardWrap.appendChild(p);
+    p.style.setProperty('--delay',`${.58+(i%5)*.016}s`); p.style.setProperty('--size',`${2+(i%3)}px`); boardWrap.appendChild(p);
   });
 }
 
 function animateFlip(){
   clearTimeout(flipTimer); boardWrap.classList.remove('flipping'); void boardWrap.offsetWidth; makeDust(); boardWrap.classList.add('flipping');
-  flipTimer=setTimeout(()=>{flipping=false;boardWrap.classList.remove('flipping');boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());document.getElementById('resign').disabled=!!gameResult()},900);
+  flipTimer=setTimeout(()=>{flipping=false;boardWrap.classList.remove('flipping');boardWrap.querySelectorAll('.dust-particle').forEach(p=>p.remove());document.getElementById('resign').disabled=!!gameResult()},950);
 }
 
 function render(playFlip=false){
   boardEl.innerHTML='';
+  // White's perspective starts with rank 1 at the bottom. After a move, the board
+  // turns to the next player's perspective, keeping that player's home rank at bottom.
   const ranks=orientation==='w'?[8,7,6,5,4,3,2,1]:[1,2,3,4,5,6,7,8];
   const fs=orientation==='w'?files:[...files].reverse();
   const legal=selected?game.moves({square:selected,verbose:true}):[];
@@ -70,6 +72,7 @@ function render(playFlip=false){
     b.className='square '+(((files.indexOf(file)+rank)%2)?'dark':'light'); b.dataset.square=sq;
     if(sq===selected)b.classList.add('selected');
     const lm=legal.find(m=>m.to===sq); if(lm)b.classList.add(lm.captured?'capture':'legal');
+    // Coordinates identify every square, e.g. a3 and f8, while remaining subtle.
     const coord=document.createElement('span'); coord.className='coord'; coord.textContent=sq; b.appendChild(coord);
     if(piece){const span=document.createElement('span');span.className='piece '+(piece.color==='w'?'white-piece':'black-piece');span.textContent=glyph[piece.type][piece.color==='w'?0:1];b.appendChild(span)}
     b.addEventListener('pointerdown',e=>{e.preventDefault();handleSquare(sq)}); boardEl.appendChild(b);

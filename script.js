@@ -32,6 +32,7 @@ let onlineGame = null;
 let onlineColor = null;
 let onlineMoves = [];
 let realtimeChannel = null;
+let promotionResolver = null;
 let playerId = localStorage.getItem('nahir_chess_player_id');
 
 if (!playerId) {
@@ -158,12 +159,44 @@ function handleSquare(sq) {
   if (piece && piece.color === game.turn()) { selected = sq; render(); }
 }
 
+function choosePromotion(color) {
+  return new Promise(resolve => {
+    promotionResolver = resolve;
+    const existing = document.getElementById('promotionModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'promotionModal';
+    modal.className = 'promotion-modal';
+    modal.innerHTML = `
+      <div class="promotion-card" role="dialog" aria-modal="true" aria-label="Choose promotion piece">
+        <div class="promotion-title">Promote pawn</div>
+        <div class="promotion-subtitle">Choose a piece</div>
+        <div class="promotion-options">
+          <button type="button" data-piece="q" aria-label="Queen"><span>${color === 'w' ? '♕' : '♛'}</span><small>Queen</small></button>
+          <button type="button" data-piece="r" aria-label="Rook"><span>${color === 'w' ? '♖' : '♜'}</span><small>Rook</small></button>
+          <button type="button" data-piece="b" aria-label="Bishop"><span>${color === 'w' ? '♗' : '♝'}</span><small>Bishop</small></button>
+          <button type="button" data-piece="n" aria-label="Knight"><span>${color === 'w' ? '♘' : '♞'}</span><small>Knight</small></button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    modal.querySelectorAll('[data-piece]').forEach(button => {
+      button.addEventListener('click', () => finishPromotion(button.dataset.piece));
+    });
+  });
+}
+
+function finishPromotion(piece) {
+  const resolver = promotionResolver;
+  promotionResolver = null;
+  document.getElementById('promotionModal')?.remove();
+  if (resolver) resolver(piece);
+}
+
 async function makeMove(from, to, move) {
   let promotion;
-  if (move.promotion) {
-    const answer = (prompt('Promote to: queen, rook, bishop, or knight', 'queen') || 'queen').toLowerCase().trim();
-    promotion = ({queen:'q',rook:'r',bishop:'b',knight:'n'})[answer] || 'q';
-  }
+  if (move.promotion) promotion = await choosePromotion(game.turn());
 
   const beforeFen = game.fen();
   let played;
@@ -387,6 +420,8 @@ function leaveOnlineGame() {
   onlineGame = null;
   onlineColor = null;
   onlineMoves = [];
+  document.getElementById('promotionModal')?.remove();
+  promotionResolver = null;
 }
 
 document.getElementById('newGame').addEventListener('click',start);
@@ -398,6 +433,3 @@ document.getElementById('confirmJoin').addEventListener('click',async () => { tr
 document.getElementById('copyCode').addEventListener('click',async () => { try { await navigator.clipboard.writeText(createdCode.textContent); waitingText.textContent='Code copied! Waiting for opponent...'; } catch { waitingText.textContent='Copy failed. Share the code manually.'; } });
 gameCodeInput.addEventListener('input',e => { e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); });
 gameCodeInput.addEventListener('keydown',e => { if(e.key==='Enter') document.getElementById('confirmJoin').click(); });
-document.getElementById('restart').addEventListener('click',start);
-document.getElementById('modalNewGame').addEventListener('click',start);
-document.getElementById('resign').addEventListener('click',resign);

@@ -2,6 +2,7 @@ import { Chess } from "https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm";
 
 const game = new Chess();
 const boardEl = document.getElementById('board');
+const boardWrap = document.querySelector('.board-wrap');
 const home = document.getElementById('home');
 const gameScreen = document.getElementById('game');
 const turnText = document.getElementById('turnText');
@@ -15,11 +16,13 @@ const resultIcon = document.getElementById('resultIcon');
 let selected = null;
 let orientation = 'w';
 let modalShown = false;
+let flipping = false;
 const files=['a','b','c','d','e','f','g','h'];
 const glyph={p:['♙','♟'],n:['♘','♞'],b:['♗','♝'],r:['♖','♜'],q:['♕','♛'],k:['♔','♚']};
 
 function start(){
-  game.reset(); selected=null; orientation='w'; modalShown=false;
+  game.reset(); selected=null; orientation='w'; modalShown=false; flipping=false;
+  boardWrap.classList.remove('flipping');
   resultModal.classList.add('hidden'); home.classList.add('hidden'); gameScreen.classList.remove('hidden'); render();
 }
 
@@ -38,7 +41,7 @@ function showResult(result){
   resultModal.classList.remove('hidden');
 }
 
-function render(){
+function render(playFlip=false){
   boardEl.innerHTML='';
   const ranks=orientation==='w'?[8,7,6,5,4,3,2,1]:[1,2,3,4,5,6,7,8];
   const fs=orientation==='w'?files:[...files].reverse();
@@ -49,6 +52,7 @@ function render(){
     b.className='square '+(((files.indexOf(file)+rank)%2)?'dark':'light'); b.dataset.square=sq;
     if(sq===selected)b.classList.add('selected');
     const lm=legal.find(m=>m.to===sq); if(lm)b.classList.add(lm.captured?'capture':'legal');
+    const coord=document.createElement('span'); coord.className='coord'; coord.textContent=sq; b.appendChild(coord);
     if(piece){const span=document.createElement('span');span.className='piece '+(piece.color==='w'?'white-piece':'black-piece');span.textContent=glyph[piece.type][piece.color==='w'?0:1];b.appendChild(span)}
     b.addEventListener('pointerdown',e=>{e.preventDefault();handleSquare(sq)}); boardEl.appendChild(b);
   }
@@ -63,13 +67,20 @@ function render(){
   statusEl.textContent=result?`${result.title} ${result.reason}`:game.inCheck()?`${turn} is in check`:`${turn} to move`;
   statusEl.className='status'+(result?' game-over':'');
   messageEl.textContent=result?'The game is finished. Start a new game to play again.':'Select a piece to see its legal moves.';
-  document.getElementById('resign').disabled=!!result;
+  document.getElementById('resign').disabled=!!result || flipping;
   renderMoves();
+  if(playFlip){
+    flipping=true;
+    boardWrap.classList.remove('flipping');
+    void boardWrap.offsetWidth;
+    boardWrap.classList.add('flipping');
+    window.setTimeout(()=>{flipping=false;boardWrap.classList.remove('flipping');document.getElementById('resign').disabled=!!gameResult()},850);
+  }
   showResult(result);
 }
 
 function handleSquare(sq){
-  if(game.isGameOver())return;
+  if(game.isGameOver()||flipping)return;
   const piece=game.get(sq);
   if(selected){
     const move=game.moves({square:selected,verbose:true}).find(m=>m.to===sq);
@@ -86,11 +97,11 @@ function makeMove(from,to,move){
     const answer=(prompt('Promote to: queen, rook, bishop, or knight','queen')||'queen').toLowerCase().trim();
     promotion=({queen:'q',rook:'r',bishop:'b',knight:'n'})[answer]||'q';
   }
-  try{game.move({from,to,promotion});orientation=game.turn()==='w'?'w':'b';selected=null;render()}catch(e){selected=null;render()}
+  try{game.move({from,to,promotion});orientation=game.turn()==='w'?'w':'b';selected=null;render(true)}catch(e){selected=null;render()}
 }
 
 function resign(){
-  if(game.isGameOver())return;
+  if(game.isGameOver()||flipping)return;
   const resigning=game.turn()==='w'?'White':'Black';
   const winner=resigning==='White'?'Black':'White';
   modalShown=true; resultTitle.textContent=`${winner} wins`; resultReason.textContent=`by resignation (${resigning} resigned)`; resultIcon.textContent=winner==='White'?'♔':'♚';

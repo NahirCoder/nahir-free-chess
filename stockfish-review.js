@@ -1,5 +1,5 @@
 import { Chess } from "https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm";
-const ENGINE_URL="https://unpkg.com/stockfish@18.0.8/bin/stockfish-18-lite-single.js",DEPTH=18;
+const ENGINE_URL="https://unpkg.com/stockfish@18.0.8/bin/stockfish-18-single.js",DEPTH=18;
 let engine=null,ready=false,busy=false,lastSignature="";
 const $=id=>document.getElementById(id);
 const classes={"Missed Win":{icon:"−",class:"missed-win"},"Miss":{icon:"×",class:"miss"},"Mistake":{icon:"?",class:"mistake"},"Interesting":{icon:"!?",class:"interesting"},"Inaccuracy":{icon:"?!",class:"inaccuracy"},"Book":{icon:"📚",class:"book"},"Good":{icon:"✓",class:"good"},"Excellent":{icon:"👍",class:"excellent"},"Best":{icon:"⭐",class:"best"},"Great":{icon:"!",class:"great"},"Brilliant":{icon:"!!",class:"brilliant"},"Blunder":{icon:"??",class:"blunder"}};

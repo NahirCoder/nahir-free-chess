@@ -40,7 +40,21 @@
 <section id="game" class="screen hidden">
 <header class="topbar"><div><strong>Nahir Free Chess</strong><span id="turnText">Chess</span></div><div class="topbar-actions"><button id="returnHome">Return to Home</button><button id="restart">New Game</button></div></header>
 <div id="onlineBanner" class="online-banner hidden"><span id="onlineGameInfo"></span><span id="onlineConnection">Connecting...</span></div>
-<div class="game-layout"><div class="board-wrap"><div id="board" aria-label="Chess board"></div><div class="game-controls"><button id="resign" class="resign">Resign</button></div></div><aside class="panel"><ol id="moves" class="moves"></ol></aside></div>
+<div class="game-layout">
+  <div class="board-wrap">
+    <div class="analysis-side">
+      <div class="eval-label black-eval">+5</div>
+      <div class="eval-bar"><div id="evalFill" class="eval-fill"></div><div id="evalMarker" class="eval-marker"></div></div>
+      <div class="eval-label white-eval">−5</div>
+    </div>
+    <div class="board-column">
+      <div id="board" aria-label="Chess board"></div>
+      <div id="analysisInfo" class="analysis-info"><span id="materialInfo">Material equal</span><span id="evalInfo">Eval 0.0</span></div>
+      <div class="game-controls"><button id="resign" class="resign">Resign</button></div>
+    </div>
+  </div>
+  <aside class="panel"><ol id="moves" class="moves"></ol></aside>
+</div>
 </section>
 </main>
 <div id="resultModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><div id="resultIcon" class="result-icon">♔</div><h2 id="resultTitle">White wins</h2><p id="resultReason">by checkmate</p><div class="result-actions"><button id="returnHomeResult">Return to Home</button><button id="modalNewGame">New Game</button></div></div></div>

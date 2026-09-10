@@ -216,8 +216,10 @@ function placeReviewBadge(square, info, label) {
   const squareElement = document.querySelector(`#board [data-square="${square}"]`); if (!squareElement) return;
   const badge = document.createElement("span");
   badge.className = `review-square-badge ${info.class}`;
-  badge.innerHTML = `<span class="review-icon">${info.icon}</span><span class="review-word">${label}</span>`;
-  badge.title = label; squareElement.appendChild(badge);
+  badge.textContent = info.icon;
+  badge.title = label;
+  badge.setAttribute("aria-label", label);
+  squareElement.appendChild(badge);
 }
 
 function updateReviewList(label) {

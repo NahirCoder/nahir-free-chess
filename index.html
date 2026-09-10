@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Nahir Free Chess</title>
+<link rel="icon" type="image/png" href="https://th.bing.com/th/id/OIP.3QIkxFbksHBmZTplEQyLpAHaHa?w=208&h=208&c=7&r=0&o=7&pid=1.7&rm=3">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="overrides.css">
 </head>
@@ -49,7 +50,7 @@
     </div>
     <div class="board-column">
       <div id="board" aria-label="Chess board"></div>
-      <div id="analysisInfo" class="analysis-info"><span id="materialInfo">Material equal</span><span id="evalInfo">Eval 0.0</span></div>
+      <div id="analysisInfo" class="analysis-info"><span id="materialInfo">Material equal</span><span id="evalInfo">SF18 0.00</span></div>
       <div class="game-controls"><button id="resign" class="resign">Resign</button></div>
     </div>
   </div>
@@ -59,5 +60,6 @@
 </main>
 <div id="resultModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><div id="resultIcon" class="result-icon">♔</div><h2 id="resultTitle">White wins</h2><p id="resultReason">by checkmate</p><div class="result-actions"><button id="returnHomeResult">Return to Home</button><button id="modalNewGame">New Game</button></div></div></div>
 <script type="module" src="script-v2.js"></script>
+<script type="module" src="stockfish-review.js"></script>
 </body>
 </html>

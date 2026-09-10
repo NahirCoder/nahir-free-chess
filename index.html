@@ -5,21 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Nahir Free Chess</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="overrides.css">
 </head>
 <body>
 <main id="app">
 <section id="home" class="screen">
-  <div class="home-orbit orbit-one"></div>
-  <div class="home-orbit orbit-two"></div>
-  <div class="home-glow"></div>
+  <div class="home-orbit orbit-one"></div><div class="home-orbit orbit-two"></div><div class="home-glow"></div>
   <div class="home-card">
     <div class="brand-mark"><span>♔</span><i></i></div>
     <div class="eyebrow"><span></span> FREE ONLINE & LOCAL CHESS <span></span></div>
     <h1>Nahir <em>Free</em> Chess</h1>
     <p>Classic chess. Play locally or challenge someone online.</p>
     <div class="home-actions">
-      <button id="newGame" class="primary-button"><span>Play Locally</span><b>→</b></button>
-      <button id="onlineGame" class="secondary-button"><span>Play Online</span><b>↗</b></button>
+      <button id="playOnline" class="primary-button"><span>Play Online</span><b>↗</b></button>
+      <button id="passNPlay" class="secondary-button"><span>Pass N Play</span><b>♟</b></button>
+      <button id="playBot" class="secondary-button"><span>Play with a Bot</span><b>♞</b></button>
     </div>
     <div class="home-detail"><span>♙</span><b>WHITE</b><i></i><b>BLACK</b><span>♟</span></div>
   </div>
@@ -31,34 +31,19 @@
     <div class="eyebrow"><span></span> ONLINE CHESS <span></span></div>
     <h2>Play with a friend</h2>
     <p class="online-subtitle">Make a game and share the code, or join a friend's game.</p>
-    <div class="online-actions">
-      <button id="makeGame" class="primary-button"><span>Make Game</span><b>+</b></button>
-      <button id="joinGame" class="secondary-button"><span>Join Game</span><b>→</b></button>
-    </div>
+    <div class="online-actions"><button id="makeGame" class="primary-button"><span>Make Game</span><b>+</b></button><button id="joinGame" class="secondary-button"><span>Join Game</span><b>→</b></button></div>
     <div id="onlineStatus" class="online-status"></div>
-    <div id="joinBox" class="join-box hidden">
-      <label for="gameCode">Game code</label>
-      <input id="gameCode" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC123">
-      <button id="confirmJoin" class="primary-button compact"><span>Join Game</span><b>→</b></button>
-    </div>
-    <div id="createdBox" class="created-box hidden">
-      <div class="created-label">Your game code</div>
-      <div id="createdCode" class="created-code">------</div>
-      <button id="copyCode" class="secondary-button compact"><span>Copy Code</span><b>⧉</b></button>
-      <p id="waitingText">Waiting for opponent...</p>
-    </div>
+    <div id="joinBox" class="join-box hidden"><label for="gameCode">Game code</label><input id="gameCode" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC123"><button id="confirmJoin" class="primary-button compact"><span>Join Game</span><b>→</b></button></div>
+    <div id="createdBox" class="created-box hidden"><div class="created-label">Your game code</div><div id="createdCode" class="created-code">------</div><button id="copyCode" class="secondary-button compact"><span>Copy Code</span><b>⧉</b></button><p id="waitingText">Waiting for opponent...</p></div>
   </div>
 </section>
 <section id="game" class="screen hidden">
-<header class="topbar"><div><strong>Nahir Free Chess</strong><span id="turnText">Chess</span></div><button id="restart">New Game</button></header>
+<header class="topbar"><div><strong>Nahir Free Chess</strong><span id="turnText">Chess</span></div><div class="topbar-actions"><button id="returnHome">Home</button><button id="restart">New Game</button></div></header>
 <div id="onlineBanner" class="online-banner hidden"><span id="onlineGameInfo"></span><span id="onlineConnection">Connecting...</span></div>
-<div class="game-layout">
-  <div class="board-wrap"><div id="board" aria-label="Chess board"></div><div class="game-controls"><button id="resign" class="resign">Resign</button></div></div>
-  <aside class="panel"><ol id="moves" class="moves"></ol></aside>
-</div>
+<div class="game-layout"><div class="board-wrap"><div id="board" aria-label="Chess board"></div><div class="game-controls"><button id="resign" class="resign">Resign</button></div></div><aside class="panel"><ol id="moves" class="moves"></ol></aside></div>
 </section>
 </main>
 <div id="resultModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><div id="resultIcon" class="result-icon">♔</div><h2 id="resultTitle">White wins</h2><p id="resultReason">by checkmate</p><button id="modalNewGame">New Game</button></div></div>
-<script type="module" src="script.js"></script>
+<script type="module" src="script-v2.js"></script>
 </body>
 </html>
